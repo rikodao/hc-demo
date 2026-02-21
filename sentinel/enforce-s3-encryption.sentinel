@@ -1,0 +1,27 @@
+# enforce-s3-encryption.sentinel
+# SOC2 Type 2 - Preventive Control
+# Ensures all S3 buckets have server-side encryption configured
+
+import "tfplan/v2" as tfplan
+
+# Find all S3 bucket resources
+s3_buckets = filter tfplan.resource_changes as _, rc {
+  rc.type is "aws_s3_bucket" and
+  (rc.change.actions contains "create" or rc.change.actions contains "update")
+}
+
+# Find all S3 encryption configurations
+s3_encryption_configs = filter tfplan.resource_changes as _, rc {
+  rc.type is "aws_s3_bucket_server_side_encryption_configuration" and
+  (rc.change.actions contains "create" or rc.change.actions contains "update")
+}
+
+# Verify each bucket has an encryption configuration
+verify_encryption = rule {
+  length(s3_buckets) <= length(s3_encryption_configs)
+}
+
+# Main rule - hard-mandatory: cannot be overridden
+main = rule {
+  verify_encryption
+}

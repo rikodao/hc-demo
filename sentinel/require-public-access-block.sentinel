@@ -1,0 +1,23 @@
+# require-public-access-block.sentinel
+# SOC2 Type 2 - Preventive Control
+# Ensures all S3 buckets block public access
+
+import "tfplan/v2" as tfplan
+
+s3_public_access_blocks = filter tfplan.resource_changes as _, rc {
+  rc.type is "aws_s3_bucket_public_access_block" and
+  (rc.change.actions contains "create" or rc.change.actions contains "update")
+}
+
+all_blocks_enforced = rule {
+  all s3_public_access_blocks as _, block {
+    block.change.after.block_public_acls is true and
+    block.change.after.block_public_policy is true and
+    block.change.after.ignore_public_acls is true and
+    block.change.after.restrict_public_buckets is true
+  }
+}
+
+main = rule {
+  all_blocks_enforced
+}
