@@ -29,6 +29,11 @@ Thumbs.db
 *.swp
 *.swo
 
+# Bootstrap state (contains sensitive data)
+bootstrap/.terraform/
+bootstrap/terraform.tfstate*
+bootstrap/.terraform.lock.hcl
+
 # Environment
 .env
 .env.*

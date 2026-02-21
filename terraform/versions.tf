@@ -2,8 +2,7 @@ terraform {
   required_version = ">= 1.5.0"
 
   cloud {
-    # Set via TF_CLOUD_ORGANIZATION environment variable
-    # organization = "your-org-name"
+    organization = "rikodao-org"
 
     workspaces {
       name = "soc2-compliance-demo"
