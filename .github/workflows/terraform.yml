@@ -12,7 +12,7 @@ permissions:
   id-token: write
 
 env:
-  TF_CLOUD_ORGANIZATION: "nextpay-demo"
+  TF_CLOUD_ORGANIZATION: "rikodao-org"
   TF_API_TOKEN: "${{ secrets.TF_API_TOKEN }}"
   TF_WORKSPACE: "soc2-compliance-demo"
 

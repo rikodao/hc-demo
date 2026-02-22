@@ -25,7 +25,7 @@ provider "tfe" {
 
 data "hcp_organization" "current" {}
 
-# --- TFC Resources (requires TFC org to be synced first) ---
+# --- TFC Resources ---
 
 data "tfe_organization" "demo" {
   name = data.hcp_organization.current.name
@@ -54,6 +54,8 @@ resource "tfe_workspace" "soc2_demo" {
     oauth_token_id = tfe_oauth_client.github.oauth_token_id
   }
 }
+
+# --- Sentinel Policy Set (VCS-backed, full plan) ---
 
 resource "tfe_policy_set" "sentinel" {
   name         = "soc2-s3-policies"
