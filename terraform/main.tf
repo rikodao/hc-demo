@@ -11,6 +11,7 @@ resource "aws_s3_bucket" "data_store" {
     Name        = "${var.project_name}-data-store"
     DataClass   = "confidential"
     Compliance  = "soc2-type2"
+    AuthMethod  = "vault-oidc"
   }
 }
 
