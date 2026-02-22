@@ -13,8 +13,7 @@ permissions:
 
 env:
   TF_CLOUD_ORGANIZATION: "rikodao-org"
-  TF_API_TOKEN: "${{ secrets.TF_API_TOKEN }}"
-  TF_WORKSPACE: "soc2-compliance-demo"
+  TF_TOKEN_app_terraform_io: "${{ secrets.TF_API_TOKEN }}"
 
 jobs:
   terraform:
@@ -30,8 +29,6 @@ jobs:
 
       - name: Setup Terraform
         uses: hashicorp/setup-terraform@v3
-        with:
-          cli_config_credentials_token: ${{ secrets.TF_API_TOKEN }}
 
       - name: Terraform Format Check
         id: fmt
@@ -57,7 +54,7 @@ jobs:
         with:
           github-token: ${{ secrets.GITHUB_TOKEN }}
           script: |
-            const output = `### Terraform Plan Result 🏗️
+            const output = `### Terraform Plan Result
 
             #### Format: \`${{ steps.fmt.outcome }}\`
             #### Init: \`${{ steps.init.outcome }}\`
@@ -72,7 +69,7 @@ jobs:
 
             </details>
 
-            > 🔒 **SOC2 Note**: This run uses OIDC-based dynamic credentials via Vault.
+            > **SOC2 Note**: This run uses OIDC-based dynamic credentials via Vault.
             > No static AWS keys are stored in this repository or CI/CD pipeline.
 
             *Pushed by: @${{ github.actor }}, Action: \`${{ github.event_name }}\`*`;
