@@ -1,23 +1,18 @@
 name: "SOC2 Compliance - Terraform"
 
+# HCP Terraform の VCS 連携が Plan/Apply/Sentinel を実行するため、
+# GitHub Actions ではコードの静的チェックのみ行う。
 on:
-  push:
-    branches: ["main"]
   pull_request:
     branches: ["main"]
 
 permissions:
   contents: read
   pull-requests: write
-  id-token: write
-
-env:
-  TF_CLOUD_ORGANIZATION: "rikodao-org"
-  TF_TOKEN_app_terraform_io: "${{ secrets.TF_API_TOKEN }}"
 
 jobs:
-  terraform:
-    name: "Terraform Plan & Apply"
+  terraform-lint:
+    name: "Terraform Lint & Validate"
     runs-on: ubuntu-latest
     defaults:
       run:
@@ -35,52 +30,15 @@ jobs:
         run: terraform fmt -check
         continue-on-error: true
 
-      - name: Terraform Init
-        id: init
-        run: terraform init
-
-      - name: Terraform Validate
-        id: validate
-        run: terraform validate -no-color
-
-      - name: Terraform Plan
-        id: plan
-        run: terraform plan -no-color
-        continue-on-error: true
-
       - name: Comment on PR
         uses: actions/github-script@v7
-        if: github.event_name == 'pull_request'
+        if: steps.fmt.outcome == 'failure'
         with:
           github-token: ${{ secrets.GITHUB_TOKEN }}
           script: |
-            const output = `### Terraform Plan Result
-
-            #### Format: \`${{ steps.fmt.outcome }}\`
-            #### Init: \`${{ steps.init.outcome }}\`
-            #### Validate: \`${{ steps.validate.outcome }}\`
-            #### Plan: \`${{ steps.plan.outcome }}\`
-
-            <details><summary>Plan Output</summary>
-
-            \`\`\`terraform
-            ${{ steps.plan.outputs.stdout }}
-            \`\`\`
-
-            </details>
-
-            > **SOC2 Note**: This run uses OIDC-based dynamic credentials via Vault.
-            > No static AWS keys are stored in this repository or CI/CD pipeline.
-
-            *Pushed by: @${{ github.actor }}, Action: \`${{ github.event_name }}\`*`;
-
             github.rest.issues.createComment({
               issue_number: context.issue.number,
               owner: context.repo.owner,
               repo: context.repo.repo,
-              body: output
+              body: '### Terraform Format Check Failed\n\nPlease run `terraform fmt` and push the formatted files.'
             })
-
-      - name: Terraform Apply
-        if: github.ref == 'refs/heads/main' && github.event_name == 'push'
-        run: terraform apply -auto-approve
