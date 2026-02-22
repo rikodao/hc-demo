@@ -17,3 +17,4 @@ output "logs_bucket_arn" {
   description = "ARN of the access logs S3 bucket"
   value       = aws_s3_bucket.access_logs.arn
 }
+
