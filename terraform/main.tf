@@ -14,6 +14,7 @@ resource "aws_s3_bucket" "data_store" {
     Name       = "${var.project_name}-data-store"
     DataClass  = "confidential"
     Compliance = "soc2-type2"
+    AuthMethod = "vault-oidc"
   }
 }
 
@@ -57,6 +58,7 @@ resource "aws_s3_bucket" "access_logs" {
     Name       = "${var.project_name}-access-logs"
     Purpose    = "audit-trail"
     Compliance = "soc2-type2"
+    AuthMethod = "vault-oidc"
   }
 }
 
