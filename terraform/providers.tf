@@ -1,11 +1,7 @@
-# デモ環境では実 AWS アカウントを使用しないため、認証チェックをスキップ。
-# 本番環境では skip_* オプションを削除し、Vault 動的認証を使用すること。
+# Vault Dynamic Provider Credentials により AWS 認証情報が自動注入される。
+# HCP Terraform が Vault に OIDC で認証し、一時的な IAM 認証情報を取得する。
 provider "aws" {
   region = var.aws_region
-
-  skip_credentials_validation = true
-  skip_metadata_api_check     = true
-  skip_requesting_account_id  = true
 
   default_tags {
     tags = {
