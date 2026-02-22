@@ -1,4 +1,4 @@
-name: "SOC2 Compliance - Terraform"
+name: "SOC2 コンプライアンス - Terraform"
 
 on:
   push:
@@ -24,44 +24,44 @@ jobs:
         working-directory: ./terraform
 
     steps:
-      - name: Checkout
+      - name: コード取得
         uses: actions/checkout@v4
 
-      - name: Setup Terraform
+      - name: Terraform セットアップ
         uses: hashicorp/setup-terraform@v3
 
-      - name: Terraform Format Check
+      - name: フォーマットチェック
         id: fmt
         run: terraform fmt -check
         continue-on-error: true
 
-      - name: Terraform Init
+      - name: 初期化
         id: init
         run: terraform init
 
-      - name: Terraform Validate
+      - name: 構文検証
         id: validate
         run: terraform validate -no-color
 
-      - name: Terraform Plan
+      - name: Plan 実行
         id: plan
         run: terraform plan -no-color
         continue-on-error: true
 
-      - name: Comment on PR
+      - name: PR にコメント投稿
         uses: actions/github-script@v7
         if: github.event_name == 'pull_request'
         with:
           github-token: ${{ secrets.GITHUB_TOKEN }}
           script: |
-            const output = `### Terraform Plan Result
+            const output = `### Terraform Plan 結果
 
-            #### Format: \`${{ steps.fmt.outcome }}\`
-            #### Init: \`${{ steps.init.outcome }}\`
-            #### Validate: \`${{ steps.validate.outcome }}\`
+            #### フォーマット: \`${{ steps.fmt.outcome }}\`
+            #### 初期化: \`${{ steps.init.outcome }}\`
+            #### 構文検証: \`${{ steps.validate.outcome }}\`
             #### Plan: \`${{ steps.plan.outcome }}\`
 
-            <details><summary>Plan Output</summary>
+            <details><summary>Plan 出力</summary>
 
             \`\`\`terraform
             ${{ steps.plan.outputs.stdout }}
@@ -69,10 +69,10 @@ jobs:
 
             </details>
 
-            > **SOC2 Note**: This run uses OIDC-based dynamic credentials via Vault.
-            > No static AWS keys are stored in this repository or CI/CD pipeline.
+            > **SOC2 備考**: この実行は Vault OIDC 動的認証を使用しています。
+            > 静的な AWS キーはこのリポジトリおよび CI/CD パイプラインに保存されていません。
 
-            *Pushed by: @${{ github.actor }}, Action: \`${{ github.event_name }}\`*`;
+            *実行者: @${{ github.actor }}, アクション: \`${{ github.event_name }}\`*`;
 
             github.rest.issues.createComment({
               issue_number: context.issue.number,
@@ -81,6 +81,6 @@ jobs:
               body: output
             })
 
-      - name: Terraform Apply
+      - name: Apply 実行
         if: github.ref == 'refs/heads/main' && github.event_name == 'push'
         run: terraform apply -auto-approve

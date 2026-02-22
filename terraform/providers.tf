@@ -1,3 +1,6 @@
+# デモ環境では実 AWS アカウントを使用しないため、認証チェックをスキップ。
+# 本番環境では skip_* オプションを削除し、Vault 動的認証を使用すること。
+
 provider "aws" {
   region = var.aws_region
 

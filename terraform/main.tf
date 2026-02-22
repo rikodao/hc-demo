@@ -1,16 +1,19 @@
 # =============================================================================
-# SOC2 Compliance Demo - S3 Bucket Configuration
-# STEP 1: This version intentionally OMITS encryption to trigger Sentinel
-# STEP 2: Set enable_encryption = true to pass Sentinel and deploy
+# SOC2 コンプライアンスデモ - S3 バケット設定
+#
+# enable_encryption 変数で暗号化の有無を切り替え可能。
+# false の場合、Sentinel ポリシー (enforce-s3-encryption) によりブロックされる。
 # =============================================================================
+
+# --- 顧客データ用バケット ---
 
 resource "aws_s3_bucket" "data_store" {
   bucket = "${var.project_name}-data-${var.environment}"
 
   tags = {
-    Name        = "${var.project_name}-data-store"
-    DataClass   = "confidential"
-    Compliance  = "soc2-type2"
+    Name       = "${var.project_name}-data-store"
+    DataClass  = "confidential"
+    Compliance = "soc2-type2"
   }
 }
 
@@ -31,7 +34,7 @@ resource "aws_s3_bucket_public_access_block" "data_store" {
   restrict_public_buckets = true
 }
 
-# --- Encryption Configuration (conditionally applied) ---
+# --- データバケットの暗号化設定（条件付き） ---
 
 resource "aws_s3_bucket_server_side_encryption_configuration" "data_store" {
   count  = var.enable_encryption ? 1 : 0
@@ -45,7 +48,7 @@ resource "aws_s3_bucket_server_side_encryption_configuration" "data_store" {
   }
 }
 
-# --- Logging Bucket ---
+# --- 監査ログ用バケット ---
 
 resource "aws_s3_bucket" "access_logs" {
   bucket = "${var.project_name}-access-logs-${var.environment}"
@@ -76,6 +79,8 @@ resource "aws_s3_bucket_public_access_block" "access_logs" {
   ignore_public_acls      = true
   restrict_public_buckets = true
 }
+
+# --- データバケットのアクセスログ出力設定 ---
 
 resource "aws_s3_bucket_logging" "data_store" {
   count  = var.enable_encryption ? 1 : 0

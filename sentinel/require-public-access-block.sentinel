@@ -1,14 +1,16 @@
 # require-public-access-block.sentinel
-# SOC2 Type 2 - Preventive Control
-# Ensures all S3 buckets block public access
+# SOC2 Type 2 - 予防的統制
+# すべての S3 バケットでパブリックアクセスが完全にブロックされていることを強制する
 
 import "tfplan/v2" as tfplan
 
+# Plan 内のパブリックアクセスブロック設定を抽出
 s3_public_access_blocks = filter tfplan.resource_changes as _, rc {
   rc.type is "aws_s3_bucket_public_access_block" and
   (rc.change.actions contains "create" or rc.change.actions contains "update")
 }
 
+# 4つのブロック項目がすべて true であることを検証
 all_blocks_enforced = rule {
   all s3_public_access_blocks as _, block {
     block.change.after.block_public_acls is true and

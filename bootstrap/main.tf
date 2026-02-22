@@ -21,16 +21,17 @@ provider "tfe" {
   hostname = "app.terraform.io"
 }
 
-# --- HCP Terraform Organization ---
+# --- HCP 組織情報の取得 ---
 
 data "hcp_organization" "current" {}
 
-# --- TFC Resources ---
+# --- HCP Terraform リソース ---
 
 data "tfe_organization" "demo" {
   name = data.hcp_organization.current.name
 }
 
+# GitHub VCS 連携（OAuth クライアント）
 resource "tfe_oauth_client" "github" {
   organization     = data.tfe_organization.demo.name
   api_url          = "https://api.github.com"
@@ -39,10 +40,11 @@ resource "tfe_oauth_client" "github" {
   oauth_token      = var.github_token
 }
 
+# デモ用ワークスペース
 resource "tfe_workspace" "soc2_demo" {
   name         = "soc2-compliance-demo"
   organization = data.tfe_organization.demo.name
-  description  = "SOC2 Compliance Demo - S3 with Sentinel + Vault"
+  description  = "SOC2 コンプライアンスデモ - S3 + Sentinel + Vault"
 
   auto_apply        = false
   queue_all_runs    = false
@@ -55,11 +57,10 @@ resource "tfe_workspace" "soc2_demo" {
   }
 }
 
-# --- Sentinel Policy Set (VCS-backed, full plan) ---
-
+# Sentinel ポリシーセット（VCS 連携で自動同期）
 resource "tfe_policy_set" "sentinel" {
   name         = "soc2-s3-policies"
-  description  = "SOC2 compliance policies for S3 bucket security"
+  description  = "SOC2 準拠のための S3 セキュリティポリシー"
   organization = data.tfe_organization.demo.name
   kind         = "sentinel"
 
@@ -75,28 +76,32 @@ resource "tfe_policy_set" "sentinel" {
   policies_path = "sentinel"
 }
 
-# --- Variables ---
+# --- 入力変数 ---
 
 variable "hcp_project_id" {
   type        = string
-  description = "HCP Project ID"
+  description = "HCP プロジェクト ID"
 }
 
 variable "github_token" {
-  type      = string
-  sensitive = true
+  type        = string
+  sensitive   = true
+  description = "GitHub パーソナルアクセストークン"
 }
 
-# --- Outputs ---
+# --- 出力値 ---
 
 output "workspace_id" {
-  value = tfe_workspace.soc2_demo.id
+  value       = tfe_workspace.soc2_demo.id
+  description = "作成されたワークスペースの ID"
 }
 
 output "workspace_url" {
-  value = tfe_workspace.soc2_demo.html_url
+  value       = tfe_workspace.soc2_demo.html_url
+  description = "ワークスペースの URL"
 }
 
 output "policy_set_id" {
-  value = tfe_policy_set.sentinel.id
+  value       = tfe_policy_set.sentinel.id
+  description = "Sentinel ポリシーセットの ID"
 }
