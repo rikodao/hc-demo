@@ -20,5 +20,5 @@ variable "environment" {
 variable "enable_encryption" {
   description = "Enable S3 bucket encryption"
   type        = bool
-  default     = true
+  default     = false
 }
