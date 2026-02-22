@@ -15,6 +15,7 @@ resource "aws_s3_bucket" "data_store" {
     DataClass  = "confidential"
     Compliance = "soc2-type2"
     AuthMethod = "vault-oidc"
+    AuthMethod = "vault-oidc"
   }
 }
 
