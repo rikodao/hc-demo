@@ -44,7 +44,7 @@ resource "tfe_oauth_client" "github" {
 resource "tfe_workspace" "soc2_demo" {
   name         = "soc2-compliance-demo"
   organization = data.tfe_organization.demo.name
-  description  = "SOC2 コンプライアンスデモ - S3 + Sentinel + Vault"
+  description  = "SOC2 Compliance Demo - S3 with Sentinel + Vault"
 
   auto_apply        = false
   queue_all_runs    = false
@@ -57,10 +57,10 @@ resource "tfe_workspace" "soc2_demo" {
   }
 }
 
-# Sentinel ポリシーセット（VCS 連携で自動同期）
+# Sentinel ポリシーセット（VCS 連携で sentinel/ ディレクトリから自動同期）
 resource "tfe_policy_set" "sentinel" {
   name         = "soc2-s3-policies"
-  description  = "SOC2 準拠のための S3 セキュリティポリシー"
+  description  = "SOC2 compliance policies for S3 bucket security"
   organization = data.tfe_organization.demo.name
   kind         = "sentinel"
 
@@ -76,32 +76,25 @@ resource "tfe_policy_set" "sentinel" {
   policies_path = "sentinel"
 }
 
-# --- 入力変数 ---
-
 variable "hcp_project_id" {
   type        = string
-  description = "HCP プロジェクト ID"
+  description = "HCP Project ID"
 }
 
 variable "github_token" {
   type        = string
   sensitive   = true
-  description = "GitHub パーソナルアクセストークン"
+  description = "GitHub personal access token"
 }
 
-# --- 出力値 ---
-
 output "workspace_id" {
-  value       = tfe_workspace.soc2_demo.id
-  description = "作成されたワークスペースの ID"
+  value = tfe_workspace.soc2_demo.id
 }
 
 output "workspace_url" {
-  value       = tfe_workspace.soc2_demo.html_url
-  description = "ワークスペースの URL"
+  value = tfe_workspace.soc2_demo.html_url
 }
 
 output "policy_set_id" {
-  value       = tfe_policy_set.sentinel.id
-  description = "Sentinel ポリシーセットの ID"
+  value = tfe_policy_set.sentinel.id
 }
