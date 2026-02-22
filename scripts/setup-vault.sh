@@ -97,15 +97,20 @@ echo -e "${GREEN}  ✓ JWT Auth Method を設定${NC}"
 # --- Step 4: JWT Auth ロール設定 ---
 echo -e "${BLUE}[Step 4]${NC} JWT Auth ロール設定..."
 
-vault write auth/tfc/role/tfc-soc2-demo \
-  role_type="jwt" \
-  bound_audiences="vault.workload.identity" \
-  bound_claims_type="glob" \
-  bound_claims="{\"sub\":\"organization:${TFC_ORG}:workspace:${TFC_WORKSPACE}:run_phase:*\"}" \
-  user_claim="terraform_full_workspace" \
-  token_policies="tfc-soc2-demo" \
-  token_ttl="20m" \
-  token_max_ttl="30m"
+vault write auth/tfc/role/tfc-soc2-demo - <<ROLE_JSON
+{
+  "role_type": "jwt",
+  "bound_audiences": "vault.workload.identity",
+  "bound_claims_type": "glob",
+  "bound_claims": {
+    "sub": "organization:${TFC_ORG}:project:*:workspace:${TFC_WORKSPACE}:run_phase:*"
+  },
+  "user_claim": "terraform_full_workspace",
+  "token_policies": "tfc-soc2-demo",
+  "token_ttl": "20m",
+  "token_max_ttl": "30m"
+}
+ROLE_JSON
 
 echo -e "${GREEN}  ✓ ロール tfc-soc2-demo を作成${NC}"
 

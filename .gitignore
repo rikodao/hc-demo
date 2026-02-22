@@ -37,3 +37,6 @@ bootstrap/.terraform.lock.hcl
 # Environment
 .env
 .env.*
+
+# Agent context (local only)
+.context.md
